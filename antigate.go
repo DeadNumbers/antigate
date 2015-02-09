@@ -2,10 +2,13 @@ package antigate
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
+	// "net/url"
+	// "strconv"
+	"strings"
 )
 
 type antigate struct {
@@ -50,21 +53,50 @@ func uploadCaptcha(imageBody string, key string) (string, error) {
 
 	fmt.Println("Key:", key)
 
-	resp, err := http.PostForm(
-		"http://antigate.com/in.php",
-		url.Values{
-			"method": {"base64"},
-			"key":    {key},
-			"body":   {imageBody},
-		})
+	/*
+		resp, err := http.PostForm(
+			"http://antigate.com/in.php",
+			url.Values{
+				"method": {"base64"},
+				"key":    {key},
+				"body":   {imageBody},
+			})
 
-	if err != nil {
-		return "", err
-	}
+		if err != nil {
+			return "", err
+		}
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		// fmt.Println(string(body))
+		strBody := string(body)
+	*/
+
+	// strBody := "OK | 154209387"
+
+	// if strings.Contains(strBody, "OK") == false {
+	// 	return "", errors.New("Failed to get captcha-id")
+	// }
+
+	// id, err := strconv.Atoi(strBody)
+	// if err != nil {
+	// 	return "", err
+	// }
+
+	// fmt.Println(id)
 
 	return "", nil
+}
+
+func parseCaptchaId(str string) (string, error) {
+	list := strings.Split(str, "|")
+	for i := range list {
+		list[i] = strings.TrimSpace(list[i])
+	}
+
+	if list[0] != "OK" {
+		return "", errors.New("Unable to get a captcha id")
+	}
+
+	return list[1], nil
 }
