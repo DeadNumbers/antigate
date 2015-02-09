@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	// "net/url"
-	// "strconv"
+	"net/url"
 	"strings"
 )
 
@@ -30,6 +29,8 @@ func (a *antigate) ProcessCaptchaByUrl(url string) (string, error) {
 		return "", err
 	}
 
+	fmt.Println("captcha_id = ", captcha_id)
+
 	return captcha_id, nil
 }
 
@@ -50,42 +51,29 @@ func loadImage(url string) (string, error) {
 }
 
 func uploadCaptcha(imageBody string, key string) (string, error) {
+	resp, err := http.PostForm(
+		"http://antigate.com/in.php",
+		url.Values{
+			"method": {"base64"},
+			"key":    {key},
+			"body":   {imageBody},
+		})
+	if err != nil {
+		return "", err
+	}
 
-	fmt.Println("Key:", key)
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
 
-	/*
-		resp, err := http.PostForm(
-			"http://antigate.com/in.php",
-			url.Values{
-				"method": {"base64"},
-				"key":    {key},
-				"body":   {imageBody},
-			})
+	id, err := parseCaptchaId(string(body))
+	if err != nil {
+		return "", err
+	}
 
-		if err != nil {
-			return "", err
-		}
-
-		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
-		// fmt.Println(string(body))
-		strBody := string(body)
-	*/
-
-	// strBody := "OK | 154209387"
-
-	// if strings.Contains(strBody, "OK") == false {
-	// 	return "", errors.New("Failed to get captcha-id")
-	// }
-
-	// id, err := strconv.Atoi(strBody)
-	// if err != nil {
-	// 	return "", err
-	// }
-
-	// fmt.Println(id)
-
-	return "", nil
+	return id, nil
 }
 
 func parseCaptchaId(str string) (string, error) {
