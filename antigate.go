@@ -3,12 +3,12 @@ package antigate
 import (
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type antigate struct {
@@ -30,9 +30,12 @@ func (a *antigate) ProcessCaptchaByUrl(url string) (string, error) {
 		return "", err
 	}
 
-	fmt.Println("captcha_id = ", captcha_id)
+	captcha, err := checkCaptcha(captcha_id, a.key)
+	if err != nil {
+		return "", err
+	}
 
-	return captcha_id, nil
+	return captcha, nil
 }
 
 func (a *antigate) GetBalance() (float64, error) {
@@ -111,7 +114,6 @@ func parseCaptchaId(str string) (string, error) {
 	return list[1], nil
 }
 
-/*
 func checkCaptcha(id, key string) (string, error) {
 	url := "http://antigate.com/res.php?key=" + key + "&action=get&id=" + id
 
@@ -125,5 +127,22 @@ func checkCaptcha(id, key string) (string, error) {
 		return "", err
 	}
 
+	// parsing reponse
+	response := string(body)
+
+	if strings.Contains(response, "OK") {
+		list := strings.Split(response, "|")
+		for i := range list {
+			list[i] = strings.TrimSpace(list[i])
+		}
+
+		return list[1], nil
+	}
+
+	if response == "CAPCHA_NOT_READY" {
+		time.Sleep(5 * time.Second)
+		return checkCaptcha(id, key)
+	}
+
+	return "", errors.New("Error while receiving captcha")
 }
-*/
