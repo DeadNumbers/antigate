@@ -1,27 +1,49 @@
 package antigate
 
 import (
+	"fmt"
 	"io/ioutil"
 	"strings"
 	"testing"
 )
 
+var a *antigate
+
+func initAntigate() {
+	if a != nil {
+		return
+	}
+
+	antigate_key, err := readTextFile("key")
+	if err != nil {
+		panic("Error while reading key file")
+	}
+
+	a = New(antigate_key)
+}
+
 func TestProcessCaptchaByUrl(t *testing.T) {
 	captcha_url := "https://bytebucket.org/poetofcode/antigate/raw/061c18a443b8a2af6ed400da3da1e7d28959f909/captcha.png"
 	expected := "83tsU"
 
-	antigate_key, err := readTextFile("key")
-	if err != nil {
-		t.Error(err)
-	}
-
-	a := New(antigate_key)
+	initAntigate()
 	captcha, err := a.ProcessCaptchaByUrl(captcha_url)
 
 	if err != nil {
 		t.Error(err)
 	} else if captcha != expected {
 		t.Error("Expected:", expected, "Got:", captcha)
+	}
+}
+
+func TestGetBalance(t *testing.T) {
+	initAntigate()
+
+	balance, err := a.GetBalance()
+	if err != nil {
+		t.Error(err)
+	} else {
+		fmt.Println("Balance:", balance)
 	}
 }
 

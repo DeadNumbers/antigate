@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -14,8 +15,8 @@ type antigate struct {
 	key string
 }
 
-func New(key string) antigate {
-	return antigate{key}
+func New(key string) *antigate {
+	return &antigate{key}
 }
 
 func (a *antigate) ProcessCaptchaByUrl(url string) (string, error) {
@@ -32,6 +33,27 @@ func (a *antigate) ProcessCaptchaByUrl(url string) (string, error) {
 	fmt.Println("captcha_id = ", captcha_id)
 
 	return captcha_id, nil
+}
+
+func (a *antigate) GetBalance() (float64, error) {
+	var url = "http://antigate.com/res.php?key=" + a.key + "&action=getbalance"
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return 0, err
+	}
+	balance, err := strconv.ParseFloat(string(body), 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return balance, nil
 }
 
 func loadImage(url string) (string, error) {
@@ -88,3 +110,20 @@ func parseCaptchaId(str string) (string, error) {
 
 	return list[1], nil
 }
+
+/*
+func checkCaptcha(id, key string) (string, error) {
+	url := "http://antigate.com/res.php?key=" + key + "&action=get&id=" + id
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+}
+*/
