@@ -22,12 +22,25 @@ func initAntigate() {
 	a = New(antigate_key)
 }
 
-func TestProcessCaptchaByUrl(t *testing.T) {
+func TestProcessFromUrl(t *testing.T) {
 	captcha_url := "https://bytebucket.org/poetofcode/antigate/raw/061c18a443b8a2af6ed400da3da1e7d28959f909/captcha.png"
 	expected := "83tsU"
 
 	initAntigate()
-	captcha, err := a.ProcessCaptchaByUrl(captcha_url)
+	captcha, err := a.ProcessFromUrl(captcha_url)
+
+	if err != nil {
+		t.Error(err)
+	} else if captcha != expected {
+		t.Error("Expected:", expected, "Got:", captcha)
+	}
+}
+
+func TestProcessFromFile(t *testing.T) {
+	expected := "83tsU"
+
+	initAntigate()
+	captcha, err := a.ProcessFromFile("captcha.png")
 
 	if err != nil {
 		t.Error(err)

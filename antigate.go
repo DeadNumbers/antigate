@@ -19,13 +19,32 @@ func New(key string) *antigate {
 	return &antigate{key}
 }
 
-func (a *antigate) ProcessCaptchaByUrl(url string) (string, error) {
+func (a *antigate) ProcessFromUrl(url string) (string, error) {
 	image, err := loadImage(url)
 	if err != nil {
 		return "", err
 	}
 
 	captcha_id, err := uploadCaptcha(image, a.key)
+	if err != nil {
+		return "", err
+	}
+
+	captcha, err := checkCaptcha(captcha_id, a.key)
+	if err != nil {
+		return "", err
+	}
+
+	return captcha, nil
+}
+
+func (a *antigate) ProcessFromFile(path string) (string, error) {
+	file, err := loadFile(path)
+	if err != nil {
+		return "", err
+	}
+
+	captcha_id, err := uploadCaptcha(file, a.key)
 	if err != nil {
 		return "", err
 	}
@@ -72,6 +91,16 @@ func loadImage(url string) (string, error) {
 	}
 
 	str := base64.StdEncoding.EncodeToString(body)
+	return str, nil
+}
+
+func loadFile(path string) (string, error) {
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	str := base64.StdEncoding.EncodeToString(content)
+
 	return str, nil
 }
 
