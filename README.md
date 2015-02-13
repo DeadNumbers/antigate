@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	a := New("YOUR_ANTIGATE_API_KEY")
+	a := antigate.New("YOUR_ANTIGATE_API_KEY")
 
 	// From URL
 	captcha_text, _ := a.ProcessFromUrl("https://bytebucket.org/poetofcode/antigate/raw/061c18a443b8a2af6ed400da3da1e7d28959f909/captcha.png")
