@@ -1,6 +1,6 @@
 # Antigate API (Golang)
 
-API на языке Go для сервиса распознавания капч [Antigate](anti-captcha.com)
+API на языке Go для сервиса распознавания капч [Antigate](http://anti-captcha.com/)
 
 ## Пример использования
 
