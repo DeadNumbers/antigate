@@ -1,29 +1,54 @@
-# README #
+# Antigate API (Golang)
 
-This README would normally document whatever steps are necessary to get your application up and running.
+API на языке Go для сервиса распознавания капч [Antigate](anti-captcha.com)
 
-### What is this repository for? ###
+## Пример использования
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+```
+#!go
 
-### How do I get set up? ###
+package main
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+import (
+	"fmt"
+	"bitbucket.org/poetofcode/antigate" 
+)
 
-### Contribution guidelines ###
+func main() {
+	a := New("YOUR_ANTIGATE_API_KEY")
 
-* Writing tests
-* Code review
-* Other guidelines
+	// From URL
+	captcha_text, _ := a.ProcessFromUrl("https://bytebucket.org/poetofcode/antigate/raw/061c18a443b8a2af6ed400da3da1e7d28959f909/captcha.png")
+	fmt.Println("from url:", captcha_text)
 
-### Who do I talk to? ###
+	// From file
+	captcha_text, _ = a.ProcessFromFile("captcha.png")	// the file "captcha.png" must exist
+	fmt.Println("from file:", captcha_text)
 
-* Repo owner or admin
-* Other community or team contact
+	// Your balance
+	balance, _ := a.GetBalance()
+	fmt.Println("balance:", balance)
+}
+
+```
+
+Сохраните этот код в файл под именем **main.go** и выполните в терминале:
+```
+go get
+go run main.go
+```
+
+## Запуск тестов
+
+Клонируйте репозиторий:
+
+```
+hg clone https://bitbucket.org/poetofcode/antigate
+cd antigate
+```
+Создайте в каталоге репозиторий файл под именем **key** (без расширения) и сохраните в нём свой ключ от Antigate
+
+Для запуска тестов выполните:
+```
+go test
+```
